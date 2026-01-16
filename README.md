@@ -1,4 +1,4 @@
-# 🍅 Tomato Leaf Disease Classification (95% Accuracy Target)
+# 🍅 Tomato Leaf Disease Classification (90% Accuracy)
 
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange)
