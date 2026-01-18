@@ -1,119 +1,48 @@
-🍅 Professional Tomato Leaf Disease Classification (v2.0)
+# 🍅 Professional Tomato Leaf Disease Classification (v2.0)
+
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange)
+![Status](https://img.shields.io/badge/Status-Success-green)
+![Accuracy](https://img.shields.io/badge/Accuracy-92%25-brightgreen)
+
+## 📌 Project Overview
+This project implements a robust deep learning pipeline for detecting diseases in tomato leaves using **Transfer Learning with MobileNetV2**. It is designed to assist in precision agriculture by automating the identification of plant stress.
+
+**Version 2.0** introduces significant improvements over standard CNN approaches:
+* **Architecture:** MobileNetV2 (Pre-trained on ImageNet) with fine-tuning.
+* **Robustness:** Strong data augmentation (Zoom, Rotation, Contrast, Brightness) to handle field conditions.
+* **Balance:** Automated Class Weight computation to handle dataset imbalance.
+* **Visualization:** Comprehensive reporting including Confusion Matrices, Learning Curves, and F1-Score distributions.
+
+## 📂 Dataset
+The model is trained on the **Tomato Leaf Disease Dataset** containing 4 distinct classes:
+
+1.  **Healthy**
+2.  **Early Blight** (Fungal infection)
+3.  **Late Blight** (Water mold infection)
+4.  **Leaf Mold** (Fungal pathogen)
+
+* **Input Size:** 224x224 pixels
+* **Batch Size:** 32
+* **Train/Val Split:** 80% / 20%
+
+## 🏗️ Model Architecture
+The pipeline utilizes **MobileNetV2** as the feature extractor, which is highly efficient for mobile and edge deployment.
+
+1.  **Input Layer:** `(224, 224, 3)`
+2.  **Data Augmentation:** RandomFlip, RandomRotation (0.25), RandomZoom (0.3), RandomContrast (0.3), RandomBrightness (0.2).
+3.  **Base Model:** MobileNetV2 (Frozen bottom layers, Fine-tuned top 50 layers).
+4.  **Global Average Pooling:** Reduces spatial dimensions.
+5.  **Classifier Head:**
+    * Batch Normalization
+    * Dense (256, ReLU)
+    * Dropout (0.5) to prevent overfitting
+    * Output Dense (Softmax, 4 classes)
+
+## 📊 Performance Results
 
 
 
-
-
-
-
-
-
-
-📌 Project Overview
-
-This repository contains a professional deep learning pipeline for automated tomato leaf disease classification using transfer learning with MobileNetV2.
-The system is designed for precision agriculture, enabling early disease detection to reduce crop loss and improve treatment efficiency.
-
-Version 2.0 introduces a production-grade architecture with improved robustness, interpretability, and deployment readiness.
-
-Key Highlights
-
-Architecture: MobileNetV2 pretrained on ImageNet with fine-tuning
-
-Accuracy: 92% validation accuracy
-
-Robustness: Strong data augmentation for real-field conditions
-
-Imbalance Handling: Automated class weighting
-
-Explainability: Confusion Matrix, Learning Curves, F1-Score analysis
-
-Deployment: Mobile-ready and exportable (.keras, .pkl)
-
-📂 Dataset
-
-The model is trained on a curated Tomato Leaf Disease Dataset consisting of four classes:
-
-Healthy
-
-Early Blight (fungal infection)
-
-Late Blight (water mold infection)
-
-Leaf Mold (fungal pathogen)
-
-Dataset Configuration
-
-Total Images: 2,979
-
-Input Resolution: 224 × 224
-
-Batch Size: 32
-
-Train / Validation Split: 80% / 20%
-
-Class Distribution (Approx.)
-Class	Images
-Early Blight	~750
-Late Blight	~1100
-Leaf Mold	~850
-Healthy	~280
-🏗️ Model Architecture
-
-The pipeline leverages MobileNetV2 as an efficient feature extractor optimized for edge and mobile deployment.
-
-Architecture Flow
-
-Input Layer: (224, 224, 3)
-
-Data Augmentation:
-
-Random Flip
-
-Random Rotation (0.25)
-
-Random Zoom (0.3)
-
-Random Contrast (0.3)
-
-Random Brightness (0.2)
-
-Base Model: MobileNetV2 (ImageNet pretrained)
-
-Bottom layers frozen
-
-Top layers fine-tuned
-
-Global Average Pooling
-
-Classifier Head:
-
-Batch Normalization
-
-Dense (ReLU)
-
-Dropout (0.5)
-
-Dense (Softmax, 4 classes)
-
-Total Parameters: ~2.26M
-Trainable Parameters: ~1.85M
-
-⚙️ Training Configuration
-
-Optimizer: Adam
-
-Learning Rate: 1e-5
-
-Loss Function: Sparse Categorical Crossentropy
-
-Epochs: 40
-
-Callbacks:
-
-Early Stopping (patience = 8)
-
-ReduceLROnPlateau (factor = 0.3)
 
 📊 Performance Results
 Overall Metrics
