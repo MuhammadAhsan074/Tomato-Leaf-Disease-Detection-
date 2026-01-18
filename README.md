@@ -1,6 +1,7 @@
-.
 
 🍅 Professional Tomato Leaf Disease Classification (v2.0)
+
+
 📖 Introduction
 This project implements a robust deep learning pipeline for the automated classification of tomato leaf diseases. Utilizing Transfer Learning with MobileNetV2, the system is designed to identify four distinct classes of plant health conditions. Version 2.0 introduces advanced data augmentation, class balancing, and professional-grade visualization to ensure high reliability and interpretability.
 
