@@ -1,496 +1,191 @@
-Tomato Leaf Disease Classification System (v2.0)
-📋 Overview
-A professional deep learning system for automated detection and classification of tomato leaf diseases using MobileNetV2 architecture. Achieves 92% accuracy in distinguishing between three common tomato diseases and healthy leaves, providing valuable agricultural decision support.
-
-Key Features:
-
-🎯 92% Validation Accuracy (Target: 95%+ achievable with extended training)
-
-🏗️ MobileNetV2 Architecture with transfer learning
-
-📊 6 Comprehensive Visualizations for performance analysis
-
-⚖️ Automatic Class Balancing with weighted training
-
-🌱 Agricultural Advice Generation for each disease
-
-💾 Multiple Save Formats (.keras, .pkl)
-
-📱 Ready for Mobile Deployment
-
-📂 Table of Contents
-Dataset Description
-
-Technical Implementation
-
-Results & Analysis
-
-Installation & Usage
-
-Visualization Gallery
-
-Model Performance
-
-Deployment
-
-Conclusion & Future Work
-
-Project Structure
-
-🌿 Dataset Description
-Source & Structure
-text
-Dataset Location: "/content/drive/MyDrive/Tomato datasets"
-Dataset Structure:
-├── Early_blight/
-├── Late_blight/
-├── Leaf_Mold/
-└── healthy/
-Statistics
-Metric	Value
-Total Images	2,979
-Training Set	2,384 images (80%)
-Validation Set	595 images (20%)
-Number of Classes	4
-Training Time	~3.5 hours (Colab GPU)
-Class Distribution
-Class	Approx. Images	Class Weight
-Early Blight	~750	1.124
-Late Blight	~1,100	0.956
-Leaf Mold	~850	0.997
-Healthy	~280	0.942
-⚙️ Technical Implementation
-Step 1: Environment Setup
-python
-# Mount Google Drive for dataset access
-from google.colab import drive
-drive.mount('/content/drive')
-
-# Configuration
-DATASET_PATH = "/content/drive/MyDrive/Tomato datasets"
-IMG_SIZE = (224, 224)
-BATCH_SIZE = 32
-SEED = 42
-EPOCHS = 40
-LEARNING_RATE = 1e-5
-Step 2: Data Loading & Preprocessing
-python
-# Load datasets with 80-20 train-validation split
-train_ds = tf.keras.utils.image_dataset_from_directory(
-    DATASET_PATH,
-    validation_split=0.2,
-    subset="training",
-    seed=SEED,
-    image_size=IMG_SIZE,
-    batch_size=BATCH_SIZE
-)
-
-# Apply error handling for corrupt images
-train_ds = train_ds.apply(tf.data.experimental.ignore_errors())
-
-# Data augmentation pipeline
-data_augmentation = tf.keras.Sequential([
-    layers.RandomFlip("horizontal"),
-    layers.RandomRotation(0.25),
-    layers.RandomZoom(0.3),
-    layers.RandomContrast(0.3),
-    layers.RandomBrightness(0.2),
-])
-Step 3: Model Architecture (MobileNetV2)
-text
-Model: "sequential_1"
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
-┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
-│ sequential (Sequential)         │ ?                      │   0 (unbuilt) │
-├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ rescaling (Rescaling)           │ ?                      │   0 (unbuilt) │
-├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ mobilenetv2_1.00_224            │ (None, 7, 7, 1280)     │     2,257,984 │
-│ (Functional)                    │                        │               │
-├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ global_average_pooling2d        │ ?                      │             0 │
-│ (GlobalAveragePooling2D)        │                        │               │
-├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ batch_normalization             │ ?                      │   0 (unbuilt) │
-│ (BatchNormalization)            │                        │               │
-├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ dense (Dense)                   │ ?                      │   0 (unbuilt) │
-├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ dropout (Dropout)               │ ?                      │             0 │
-├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ dense_1 (Dense)                 │ ?                      │   0 (unbuilt) │
-└─────────────────────────────────┴────────────────────────┴───────────────┘
-Total params: 2,257,984 (8.61 MB)
-Trainable params: 1,855,104 (7.08 MB)
-Non-trainable params: 402,880 (1.54 MB)
-Step 4: Training Configuration
-python
-# Optimizer
-optimizer = tf.keras.optimizers.Adam(learning_rate=LEARNING_RATE)
-
-# Loss Function
-loss = "sparse_categorical_crossentropy"
-
-# Callbacks for better training
-callbacks = [
-    tf.keras.callbacks.EarlyStopping(
-        patience=8,
-        restore_best_weights=True,
-        monitor='val_loss'
-    ),
-    tf.keras.callbacks.ReduceLROnPlateau(
-        factor=0.3,
-        patience=4,
-        min_lr=1e-7,
-        monitor='val_loss'
-    )
-]
-Step 5: Training Process
-Total Epochs: 40
-
-Batch Size: 32
-
-Class Weights Applied: Yes (to handle imbalance)
-
-Final Training Accuracy: 90.8%
-
-Final Validation Accuracy: 91.9%
-
-📈 Results & Analysis
-Overall Performance Metrics
-Metric	Value	Grade
-Overall Accuracy	92.0%	⭐⭐⭐⭐⭐
-Precision (Macro Avg)	93.0%	⭐⭐⭐⭐⭐
-Recall (Macro Avg)	91.0%	⭐⭐⭐⭐
-F1-Score (Macro Avg)	92.0%	⭐⭐⭐⭐⭐
-Training Time	~3.5 hours	⭐⭐⭐⭐
-Class-wise Performance Breakdown
-Class	Precision	Recall	F1-Score	Support	Performance
-Early Blight	94%	80%	86%	113	Good
-Late Blight	86%	93%	89%	166	Very Good
-Leaf Mold	94%	93%	94%	146	Excellent
-Healthy	97%	99%	98%	170	Outstanding
-Confusion Matrix Analysis
-Strong Diagonal: High correct prediction rates
-
-Minor Confusion: Between Early and Late Blight (biologically similar)
-
-Healthy Accuracy: 99% recall (critical for farmers)
-
-Overall: 92% of predictions correct
-
-Training Progress Summary
-Phase	Starting Accuracy	Final Accuracy	Improvement
-Training	28.3%	90.8%	+62.5%
-Validation	36.6%	91.9%	+55.3%
-Key Observation: No overfitting observed; validation accuracy closely follows training accuracy.
-
-🚀 Installation & Usage
-Prerequisites
-Python 3.8+
-
-TensorFlow 2.10+
-
-8GB+ RAM (GPU recommended for training)
-
-Quick Start
-bash
-# 1. Clone repository
-git clone https://github.com/yourusername/tomato-leaf-disease-classification.git
-cd tomato-leaf-disease-classification
-
-# 2. Install dependencies
-pip install -r requirements.txt
-
-# 3. Organize your dataset
-# Create folder structure:
-# dataset/
-# ├── Early_blight/
-# ├── Late_blight/
-# ├── Leaf_Mold/
-# └── healthy/
-
-# 4. Train the model
-python train_model.py
-
-# 5. Make predictions
-python predict.py --image test_leaf.jpg
-Google Colab Setup
-python
-# In Colab notebook
-!git clone https://github.com/yourusername/tomato-leaf-disease-classification.git
-%cd tomato-leaf-disease-classification
-
-# Mount Google Drive
-from google.colab import drive
-drive.mount('/content/drive')
-
-# Place your dataset in:
-# /MyDrive/Tomato datasets/
-
-# Run training
-!python train_model.py
-📊 Visualization Gallery
-Graph 1: Class Distribution
-Shows balanced dataset across 4 classes
-
-Healthy leaves have fewer samples (intentional agricultural focus)
-
-Graph 2 & 3: Training History
-Accuracy: Steady increase from 28% to 91%
-
-Loss: Decreased from 2.0 to 0.25
-
-No overfitting: Validation curve closely follows training
-
-Graph 4: Learning Rate Schedule
-Constant learning rate (1e-5) maintained throughout
-
-No reduction triggered (validation loss kept improving)
-
-Graph 5: Confusion Matrix
-Strong diagonal values indicate accurate predictions
-
-Healthy leaves rarely misclassified
-
-Minor confusion between Early and Late Blight
-
-Graph 6: F1-Score per Class
-Healthy leaves: 98% F1-score (best performance)
-
-Leaf Mold: 94% F1-score
-
-Late Blight: 89% F1-score
-
-Early Blight: 86% F1-score
-
-Graph 7: Sample Images Gallery
-Clear visual representation of each disease type
-
-Shows diversity within each class
-
-3 examples per class for comparison
-
-🏆 Model Performance
-Strengths Identified
-✅ High Accuracy: 92% overall accuracy exceeds practical requirements
-
-✅ Excellent Healthy Detection: 99% recall for healthy leaves (critical for farmers)
+.
 
-✅ Robust Augmentation: Multiple transformations prevent overfitting
+🍅 Professional Tomato Leaf Disease Classification (v2.0)
+📖 Introduction
+This project implements a robust deep learning pipeline for the automated classification of tomato leaf diseases. Utilizing Transfer Learning with MobileNetV2, the system is designed to identify four distinct classes of plant health conditions. Version 2.0 introduces advanced data augmentation, class balancing, and professional-grade visualization to ensure high reliability and interpretability.
 
-✅ Class Imbalance Handling: Effective use of class weights
+The model achieves a 92% weighted F1-score, making it suitable for agricultural deployment and research analysis.
 
-✅ Transfer Learning Success: MobileNetV2 adapts well to agricultural domain
+📑 Table of Contents
+Project Features
 
-✅ Comprehensive Visualization: Professional graphs for monitoring
+Dataset Details
 
-Accuracy Progression
-Epoch Range	Training Acc	Validation Acc
-1-10	28% → 73%	37% → 68%
-11-20	74% → 82%	69% → 84%
-21-30	82% → 87%	85% → 90%
-31-40	88% → 91%	90% → 92%
-Best Model Checkpoint
-Epoch 40 selected as final model
+Methodology & Architecture
 
-Validation Accuracy: 91.9%
+Installation & Requirements
 
-Validation Loss: 0.248
+Usage
 
-Training Accuracy: 90.8%
+Visualizations
 
-Training Loss: 0.234
+Results & Evaluation
 
-📱 Deployment
-Model Saving
-python
-# Save in multiple formats
-model.save("tomato_leaf_disease_model_professional_v2.keras")  # Keras format
-with open("tomato_leaf_disease_model.pkl", 'wb') as f:         # Pickle format
-    pickle.dump(model, f)
-Prediction Interface
-python
-from predict import TomatoDiseaseClassifier
+Conclusion
 
-# Initialize classifier
-classifier = TomatoDiseaseClassifier("tomato_model_v2.keras")
+Project Data & Metrics (Tables)
 
-# Single image prediction
-result = classifier.predict_image("test_leaf.jpg", show_image=True)
+🚀 Project Features
+Architecture: Fine-tuned MobileNetV2 (Pre-trained on ImageNet).
 
-# Batch prediction
-results = classifier.batch_predict("image_folder/")
-Sample Prediction Output
-text
-==================================================
-TOMATO LEAF DISEASE CLASSIFICATION RESULTS
-==================================================
-Image: test_leaf.jpg
-Prediction: Late_blight
-Confidence: 94.23%
+Robustness: Implements strong data augmentation (Flip, Rotation, Zoom, Contrast, Brightness).
 
-Probabilities:
-  • Early_blight: 3.21%
-  • Late_blight: 94.23%
-  • Leaf_Mold: 1.89%
-  • healthy: 0.67%
+Optimization: Uses class_weight="balanced" to handle dataset imbalance.
 
-ADVICE FOR LATE BLIGHT:
-• URGENT: This is highly contagious
-• Remove and destroy all infected plants
-• Apply fungicides (mancozeb, metalaxyl)
-• Do not compost infected plants
-• Keep foliage as dry as possible
-==================================================
-🔮 Future Enhancements
-Short-term Improvements (1-3 months)
-Expand Dataset
+Performance: Implements Learning Rate Decay and Early Stopping.
 
-More environmental conditions (rain, sunlight variations)
+Serialization: Saves models in both .keras (Professional) and .pkl (Legacy) formats.
 
-Different camera qualities
+Analytics: Generates 6 different visualization graphs including Confusion Matrix and F1-Score distributions.
 
-Various growth stages of plants
+📂 Dataset Details
+The dataset consists of tomato leaf images divided into four classes. The pipeline automatically handles corrupt images and splits the data into training and validation sets.
 
-Architecture Experiments
+Source Path: /content/drive/MyDrive/Tomato datasets
 
-EfficientNet for better accuracy
+Total Images: 2,979
 
-Vision Transformers (ViT)
+Image Dimensions: 224×224 pixels
 
-Ensemble methods with multiple models
+Classes: Early_blight, Late_blight, Leaf_Mold, healthy
 
-Mid-term Developments (3-6 months)
-Mobile Deployment
+🧠 Methodology & Architecture
+1. Data Pipeline
+Preprocessing: Rescaling (1./255).
 
-TensorFlow Lite conversion
+Augmentation: Random transformations applied dynamically during training to prevent overfitting.
 
-Offline mobile app development
+Performance: Uses tf.data.AUTOTUNE for caching and prefetching.
 
-Real-time camera detection
+2. Model Structure
+Base: MobileNetV2 (Top layers removed, weights frozen initially).
 
-Multi-crop Support
+Fine-Tuning: The top 50 layers of the base model were un-frozen to adapt to specific leaf features.
 
-Extend to other vegetable diseases
+Head: Global Average Pooling → Batch Normalization → Dense (256, ReLU) → Dropout (0.5) → Output (Softmax).
 
-Generic plant disease classifier
+💻 Installation & Requirements
+To run this project, ensure you have the following libraries installed:
 
-Crop-specific treatment recommendations
+Bash
 
-Long-term Vision (6-12 months)
-Integrated System
+pip install tensorflow matplotlib seaborn pandas scikit-learn
+Environment:
 
-IoT sensor integration (humidity, temperature)
+Designed for Google Colab (requires Google Drive mounting).
 
-Weather data correlation
+Hardware Acceleration: GPU (Recommended).
 
-Treatment recommendation engine
+🛠 Usage
+Mount Drive: Ensure your dataset is uploaded to Google Drive.
 
-Yield prediction module
+Configure Paths: Update DATASET_PATH in the script if your folder structure differs.
 
-Community Platform
+Run Training: Execute the script. The pipeline will:
 
-Farmer upload portal
+Load and split data.
 
-Expert validation system
+Visualize class distribution.
 
-Regional disease tracking map
+Train the model for up to 40 epochs.
 
-Treatment effectiveness feedback loop
+Generate evaluation metrics and save the model.
 
-🎯 Practical Applications
-Farm-Level Use: Quick disease diagnosis without lab equipment
+📊 Visualizations
+The system generates the following insights:
 
-Agricultural Extension: Training tool for field officers
+Class Distribution: Bar chart showing data balance.
 
-Research Support: Automated data collection for plant pathologists
+Accuracy Curve: Training vs. Validation accuracy over epochs.
 
-Educational Tool: Plant disease recognition training for students
+Loss Curve: Cross-entropy loss reduction over time.
 
-Precision Agriculture: Integration with automated treatment systems
+Learning Rate Schedule: Visualization of LR decay triggers.
 
-Insurance Claims: Documented evidence for crop loss claims
+Confusion Matrix: Heatmap of True vs. Predicted labels.
+
+Per-Class F1 Score: Bar chart showing performance per disease type.
+
+🏆 Results & Evaluation
+The model converged successfully after 40 epochs with highly stable metrics.
+
+Final Validation Accuracy: 91.93%
+
+Final Validation Loss: 0.2582
+
+Best Performing Class: healthy (98% F1-Score)
+
+Classification Insights
+The model distinguishes healthy and Leaf_Mold with near-perfect precision. Early_blight presents the highest difficulty but still achieves a respectable 86% F1-score.
 
 📝 Conclusion
-Key Achievements
-✅ Successfully implemented a production-ready disease classification system
+This project demonstrates a highly effective application of transfer learning in agriculture. By leveraging MobileNetV2 and balancing class weights, the model overcomes common challenges like data imbalance and overfitting. The resulting system is lightweight, accurate, and ready for deployment in mobile or edge devices for real-time plant disease detection.
 
-✅ Achieved 92% accuracy with MobileNetV2 transfer learning
+📈 Project Data & Metrics (Appendices)
+Below is a detailed breakdown of the project specifications and results.
 
-✅ Developed comprehensive visualizations for model interpretability
+Table 1: Project Overview
+Attribute	Details
+Project Name	Tomato Leaf Disease Classification v2.0
+Model Architecture	MobileNetV2 (Transfer Learning)
+Input Shape	(224,224,3)
+Framework	TensorFlow / Keras
+Execution Environment	Google Colab
 
-✅ Created practical agricultural advice for each disease type
+Export to Sheets
 
-✅ Built scalable architecture for future enhancements
+Table 2: Dataset Statistics
+Dataset Partition	Number of Images	Percentage
+Training Set	2,384	80%
+Validation Set	595	20%
+Total Images	2,979	100%
+Number of Classes	4	-
 
-Business Impact
-This system can:
+Export to Sheets
 
-Reduce crop losses by 30-50% through early detection
+Table 3: Training Configuration
+Parameter	Value
+Epochs	40
+Batch Size	32
+Initial Learning Rate	1e 
+−5
+ 
+Optimizer	Adam
+Loss Function	Sparse Categorical Crossentropy
 
-Decrease pesticide overuse by 40% through targeted treatment
+Export to Sheets
 
-Empower small farmers with accessible, low-cost technology
+Table 4: Final Training Metrics (Epoch 40)
+Metric	Result
+Training Accuracy	90.79%
+Training Loss	0.2344
+Validation Accuracy	91.93%
+Validation Loss	0.2582
 
-Save millions annually in agricultural losses
+Export to Sheets
 
-Improve food security through better crop management
+Table 5: Detailed Classification Report
+Class Name	Precision	Recall	F1-Score	Support
+Early_blight	0.94	0.80	0.86	113
+Late_blight	0.86	0.93	0.89	166
+Leaf_Mold	0.94	0.93	0.94	146
+healthy	0.97	0.99	0.98	170
+Weighted Avg	0.92	0.92	0.92	595
 
-Technical Merit
-The project exemplifies professional ML practices:
+Export to Sheets
 
-✅ Proper train-test splitting (80-20)
+Table 6: Optimization Techniques Used
+Technique	Purpose
+Class Weights	Balanced training for under-represented classes
+Data Augmentation	RandomFlip, Rotation, Zoom, Contrast, Brightness
+Early Stopping	Prevent overfitting (Patience = 8)
+ReduceLROnPlateau	Fine-tune learning rate when loss stagnates
+GlobalAvgPooling	Reduce parameters and prevent overfitting
 
-✅ Hyperparameter tuning with callbacks
+Export to Sheets
 
-✅ Performance monitoring with multiple metrics
-
-✅ Comprehensive evaluation and visualization
-
-✅ Production-ready model saving and loading
-
-Final Assessment
-A production-ready solution that balances accuracy, computational efficiency, and practical utility for real-world agricultural challenges. The 92% accuracy translates to reliable field performance, making it suitable for deployment in agricultural extension programs, farming communities, and research institutions.
-
-Recommendation: Ready for pilot deployment with progressive scaling based on field performance data.
-
-📁 Project Structure
-text
-tomato-leaf-disease-classification/
-├── requirements.txt              # Dependencies
-├── train_model.py               # Main training script
-├── predict.py                   # Prediction interface
-├── .gitignore                  # Git ignore rules
-├── README.md                   # This documentation
-├── dataset/                    # Your dataset folder
-│   ├── Early_blight/
-│   ├── Late_blight/
-│   ├── Leaf_Mold/
-│   └── healthy/
-├── models/                     # Saved models (generated)
-│   ├── tomato_model_v2.keras
-│   └── tomato_model.pkl
-└── plots/                      # Training visualizations (generated)
-    ├── training_history.png
-    └── confusion_matrix.png
-📞 Support & Contact
-For issues, questions, or collaboration opportunities:
-
-GitHub Issues: [Project Issues Page]
-
-Email: your.email@example.com
-
-Documentation: [Full Documentation Link]
-
-📄 License
-MIT License - See LICENSE file for details
-
-Last Updated: November 2024
-Version: 2.0
-Status: Production Ready
-Accuracy: 92% Validation
-Next Milestone: Mobile App Deployment
-
-⭐ If you find this project useful, please give it a star! ⭐
+Table 7: Generated Output Files
+File Name	Format	Description
+tomato_leaf_disease_model_professional_v2.keras	Keras	Full model (Architecture + Weights)
+tomato_leaf_disease_model.pkl	Pickle	Serialized model object
+history object	Python Dict	Contains loss/accuracy logs for plotting
