@@ -1,110 +1,42 @@
-# 🍅 Tomato Leaf Disease Classification
+# 🍅 Professional Tomato Leaf Disease Classification (v2.0)
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange)
-![Accuracy](https://img.shields.io/badge/Accuracy-90.25%25-success)
-![Status](https://img.shields.io/badge/Status-Trained-green)
+![Status](https://img.shields.io/badge/Status-Success-green)
+![Accuracy](https://img.shields.io/badge/Accuracy-92%25-brightgreen)
 
-> **A Deep Learning solution utilizing Transfer Learning (MobileNetV2) to classify tomato leaf diseases with 90%+ accuracy.**
+## 📌 Project Overview
+This project implements a robust deep learning pipeline for detecting diseases in tomato leaves using **Transfer Learning with MobileNetV2**. It is designed to assist in precision agriculture by automating the identification of plant stress.
 
----
+**Version 2.0** introduces significant improvements over standard CNN approaches:
+* **Architecture:** MobileNetV2 (Pre-trained on ImageNet) with fine-tuning.
+* **Robustness:** Strong data augmentation (Zoom, Rotation, Contrast, Brightness) to handle field conditions.
+* **Balance:** Automated Class Weight computation to handle dataset imbalance.
+* **Visualization:** Comprehensive reporting including Confusion Matrices, Learning Curves, and F1-Score distributions.
 
-## 📋 Table of Contents
-1. [Project Overview](#-project-overview)
-2. [Performance Metrics](#-performance-metrics)
-3. [Dataset Details](#-dataset-details)
-4. [Model Architecture](#-model-architecture)
-5. [Installation & Usage](#-installation--usage)
-6. [Future Improvements](#-future-improvements)
-7. [License](#-license)
+## 📂 Dataset
+The model is trained on the **Tomato Leaf Disease Dataset** containing 4 distinct classes:
 
----
+1.  **Healthy**
+2.  **Early Blight** (Fungal infection)
+3.  **Late Blight** (Water mold infection)
+4.  **Leaf Mold** (Fungal pathogen)
 
-## 📖 Project Overview
+* **Input Size:** 224x224 pixels
+* **Batch Size:** 32
+* **Train/Val Split:** 80% / 20%
 
-This project implements a Convolutional Neural Network (CNN) to automatically diagnose tomato plant diseases from leaf images. By fine-tuning a pre-trained **MobileNetV2** model, the system effectively distinguishes between healthy leaves and various fungal diseases.
+## 🏗️ Model Architecture
+The pipeline utilizes **MobileNetV2** as the feature extractor, which is highly efficient for mobile and edge deployment.
 
-The model solves the problem of class imbalance using computed class weights and utilizes strong data augmentation to generalize well to unseen data.
+1.  **Input Layer:** `(224, 224, 3)`
+2.  **Data Augmentation:** RandomFlip, RandomRotation (0.25), RandomZoom (0.3), RandomContrast (0.3), RandomBrightness (0.2).
+3.  **Base Model:** MobileNetV2 (Frozen bottom layers, Fine-tuned top 50 layers).
+4.  **Global Average Pooling:** Reduces spatial dimensions.
+5.  **Classifier Head:**
+    * Batch Normalization
+    * Dense (256, ReLU)
+    * Dropout (0.5) to prevent overfitting
+    * Output Dense (Softmax, 4 classes)
 
----
-
-## 📊 Performance Metrics
-
-Based on the latest training session (40 Epochs), the model achieved the following performance on the **Validation Set**:
-
-| Metric | Score |
-| :--- | :--- |
-| **Validation Accuracy** | **90.25%** |
-| **Training Accuracy** | **91.12%** |
-| **Macro F1-Score** | **0.89** |
-
-### Classification Report (Per Class)
-
-| Class Name | Precision | Recall | F1-Score | Support |
-| :--- | :--- | :--- | :--- | :--- |
-| **Early Blight** | 0.96 | 0.72 | 0.82 | 113 |
-| **Late Blight** | 0.84 | 0.94 | 0.89 | 166 |
-| **Leaf Mold** | 0.90 | 0.90 | 0.90 | 146 |
-| **Healthy** | 0.94 | 0.99 | 0.96 | 170 |
-
-> *Observation: The model is exceptionally good at identifying Healthy leaves (99% Recall) and Leaf Mold.*
-
----
-
-## 📂 Dataset Details
-
-The dataset was processed from Google Drive with the following structure:
-
-* **Total Images:** 2,979
-* **Training Set:** 2,384 images (80%)
-* **Validation Set:** 595 images (20%)
-* **Classes (4):**
-    1.  `Early_blight`
-    2.  `Late_blight`
-    3.  `Leaf_Mold`
-    4.  `healthy`
-
----
-
-## 🧠 Model Architecture
-
-The solution uses **Transfer Learning** with the following pipeline:
-
-1.  **Input Pipeline:** Resizing (224x224), Caching, Prefetching (`tf.data.AUTOTUNE`).
-2.  **Augmentation:** RandomFlip, RandomRotation (0.25), RandomZoom (0.3), RandomContrast (0.3).
-3.  **Base Model:** **MobileNetV2** (ImageNet weights).
-    * *Fine-tuning:* Top 50 layers unfreezed for training.
-4.  **Custom Head:**
-    * GlobalAveragePooling2D
-    * BatchNormalization
-    * Dense (256 units, ReLU)
-    * Dropout (0.5)
-    * Output Dense (4 units, Softmax)
-
-**Training Configuration:**
-* **Optimizer:** Adam (Learning Rate: `1e-5`)
-* **Loss Function:** Sparse Categorical Crossentropy
-* **Callbacks:** EarlyStopping (Patience: 7), ReduceLROnPlateau.
-
----
-
-## 🛠 Installation & Usage
- GuidePrerequisitesPython: 3.8, 3.9, or 3.10
- Hardware: NVIDIA GPU recommended for training (but runs on CPU).
- Memory: Minimum 8GB RAM
-
-
-##  Future Improvements
-Phase 1: Mobile Deployment (Q2 2026)
-         Offline functionality for remote farms.
-Action: Convert .keras model to TensorFlow Lite (.tflite).Platform: Develop an Android wrapper using Kotlin or Flutter.
-
-Phase 2: Cloud API (Q3 2026)
-        Objective: Scalable backend for multiple users.Action: Wrap the inference logic in a FastAPI container.Infrastructure: Deploy via Docker on AWS ECS.
-Phase 3: Real-Time Drone Surveillance (2027)
-
-
-### 1. Clone the Repository
-```bash
-git clone [https://github.com/your-username/tomato-disease-classification.git](https://github.com/your-username/tomato-disease-classification.git)
-cd tomato-disease-classification
+## 📊 Performance Results
