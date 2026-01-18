@@ -1,0 +1,6 @@
+tomato-leaf-disease-classification/
+├── requirements.txt
+├── train_model.py
+├── predict.py
+├── .gitignore
+└── README.md
